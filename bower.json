@@ -1,0 +1,11 @@
+{
+    "name": "mean-halyc0n-skel",
+    "version": "0.1.0",
+    "dependencies": {
+        "bootstrap": "~3.3",
+        "font-awesome": "~4.3",
+        "angular": "~1.4",
+        "angular-resource": "~1.4",
+        "angular-ui-router": "~0.2"
+    }
+}

@@ -1,0 +1,16 @@
+<div ng-controller="UsersCtrl as usCtrl">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="user in usCtrl.users">
+        <td>{{ $index }}</td>
+        <td>{{ user.username }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
