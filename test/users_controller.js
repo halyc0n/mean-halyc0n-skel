@@ -1,10 +1,10 @@
-var expect = require('chai').expect,
+'use strict';
+
+var expect    = require('chai').expect,
     supertest = require('supertest'),
-    api = supertest('http://localhost:8888/users'),
-
-    app = require('../index'),
-
-    User = require('../app/models/user');
+    api       = supertest('http://localhost:8888/users'),
+    app       = require('../index'),
+    User      = require('../app/models/user');
 
 describe('Users controller', function() {
 
