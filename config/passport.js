@@ -1,7 +1,11 @@
 'use strict';
 
 var LocalStrategy  = require('passport-local'),
-    User = require('../app/models/user');
+    User           = require('../app/models/user'),
+    Q              = require('q'),
+    debug          = require('debug'),
+    error          = debug('passport:error'),
+    findUser       = Q.nbind(User.findOne, User);
 
 module.exports = function(passport) {
 
@@ -16,52 +20,50 @@ module.exports = function(passport) {
   });
 
   passport.use('local-signup', new LocalStrategy({
-      usernameField: 'username',
-      passwordField: 'password',
-      passReqToCallback: true
+    usernameField: 'username',
+    passwordField: 'password',
+    passReqToCallback: true
   },
   function(req, username, password, done) {
-    process.nextTick(function() {
-      User.findOne({ 'username': username }, function(err, user) {
-        if (err)
-          return done(err);
-
+    findUser({ 'username': username }).
+      then(function(user) {
         if (user)
           return done(null, false, req.flash('signupMessage', 'This username is already taken.'));
 
-        var newUser = new User({
-          username: username,
-          password: password
-        });
+          var newUser = new User({
+            username: username,
+            password: password
+          });
 
-        newUser.save(function(err) {
-          if (err) throw err;
-
-          return done(null, newUser)
-        });
+          return [newUser, Q.ninvoke(newUser, "save")];
+      }).
+      spread(function(newUser) {
+        return done(null, newUser)
+      }).fail(function(err) {
+        error(err);
       });
-    });
   }));
 
   passport.use('local-login', new LocalStrategy({
-      usernameField: 'username',
-      passwordField: 'password',
-      passReqToCallback: true
+    usernameField: 'username',
+    passwordField: 'password',
+    passReqToCallback: true
   },
   function(req, username, password, done) {
-    User.findOne({ 'username': username }, function(err, user) {
-      if (err)
-        return done(err);
-
+    findUser({ 'username': username }).
+      then(function(user) {
         if (!user)
           return done(null, false, req.flash('loginMessage', 'Incorrect username or password.'));
 
-        user.validPassword(password, function(err, res) {
-          if (!res)
-            return done(null, false, req.flash('loginMessage', 'Incorrect username or password.'));
+        return [user, Q.ninvoke(user, "validPassword", password)];
+      }).
+      spread(function(user, res) {
+        if (!res)
+          return done(null, false, req.flash('loginMessage', 'Incorrect username or password.'));
 
-          return done(null, user);
-        });
-    });
+        return done(null, user);
+      }).fail(function(error) {
+        error(err);
+      });
   }));
 };
