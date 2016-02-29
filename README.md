@@ -7,6 +7,7 @@ Skeleton application for MEAN stack (MongoDB Express AngularJS Node.js)
 ```bash
 $ git clone https://github.com/halyc0n/mean-halyc0n-skel
 $ cd mean-halyc0n-skel
+$ npm install -g node-gyp
 $ npm install
 $ bower install
 ```
